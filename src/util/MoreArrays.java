@@ -117,7 +117,7 @@ public final class MoreArrays {
 
     public static <@NonNull T> void fill(final T[] array, final Supplier<? extends T> supplier) {
         for (int i = 0; i < array.length; i++) {
-            array[i] = supplier.get();
+            array[i] = Maybe.just(supplier.get()).fromJust();
         }
     }
 
@@ -420,7 +420,7 @@ public final class MoreArrays {
     public static <T, U> U[] map(final Function<? super T, ? extends U> f, final T[] xs, final IntFunction<U[]> retGen) {
         final U[] ret = retGen.apply(xs.length);
         for (int i = 0; i < xs.length; i++) {
-            ret[i] = f.apply(xs[i]);
+            ret[i] = Maybe.just(f.apply(xs[i])).fromJust();
         }
         return ret;
     }
