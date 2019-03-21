@@ -9,41 +9,46 @@ import org.eclipse.jdt.annotation.NonNull;
 
 import util.function.TriFunction;
 
-public final class MoreLists {
-    private MoreLists() {
+/**
+ * Utilities not present in {@link List}.
+ */
+public final class Lists {
+    private Lists() {
         throw new UnsupportedOperationException();
     }
 
     /**
      * A specialization of {@linkplain #zipWith(BiFunction, List, List)} where the joiner is
      * {@link Pair#Pair(Object, Object) new Pair(T, U)}
+     * @param fst the first elements of the pairs in the returned list
+     * @param snd the second elements of the pairs in the returned list
+     * @return the list of c<sub>i</sub>=(fst.get(i), snd.get(i)) such that 0 &le; i &lt; min(fst.size(), snd.size())
      */
     public static <@NonNull T, @NonNull U> List<Pair<T, U>> zip(final List<T> fst, final List<U> snd) {
-        return MoreLists.zipWith(Pair::new, fst, snd);
+        return Lists.zipWith(Pair::new, fst, snd);
     }
 
     /**
-     * A specialization ,f {@linkplain #zipIndexWith(TriFunction, List, List)} where the joiner is
+     * A specialization of {@linkplain #zipIndexWith(TriFunction, List, List)} where the joiner is
      * {@code (i, f, s) -> joiner.apply(f, s)}.
+     * @param joiner the function to turn the pairs of elements into a single object
+     * @param fst the list of first arguments to joiner
+     * @param snd the list of second arguments to joiner
+     * @return the list of c<sub>i</sub>=joiner(fst.get(i), snd.get(i)) such that 0 &le; i &lt; min(fst.size(), snd.size())
      */
-    public static <T, U, V> List<V> zipWith(
-            final BiFunction<T, U, V> joiner,
-            final List<T> fst,
-            final List<U> snd) {
-
-        return MoreLists.zipIndexWith((i, f, s) -> joiner.apply(f, s), fst, snd);
+    public static <T, U, V> List<V> zipWith(final BiFunction<T, U, V> joiner, final List<T> fst, final List<U> snd) {
+        return Lists.zipIndexWith((i, f, s) -> joiner.apply(f, s), fst, snd);
     }
 
     /**
      * A specialization of {@linkplain #zipIndexWith(TriFunction, List, List)} where the joiner is
      * {@code (i, f, s) -> new Pair<>(i, new Pair<>(f, s))}.
+     * @param fst the first elements of the pairs in the returned list
+     * @param snd the second elements of the pairs in the returned list
+     * @return the list of c<sub>i</sub>=(i, (fst.get(i), snd.get(i))) such that 0 &le; i &lt; min(fst.size(), snd.size())
      */
-    public static <@NonNull T, @NonNull U> List<Pair<Integer, Pair<T, U>>> zipIndex(
-            final List<T> fst,
-            final List<U> snd) {
-
-        return MoreLists.zipIndexWith(
-                (i, f, s) -> new Pair<>(i, new Pair<>(f, s)), fst, snd);
+    public static <@NonNull T, @NonNull U> List<Pair<Integer, Pair<T, U>>> zipIndex(final List<T> fst, final List<U> snd) {
+        return Lists.zipIndexWith((i, f, s) -> new Pair<>(i, new Pair<>(f, s)), fst, snd);
     }
 
     /**
@@ -59,18 +64,21 @@ public final class MoreLists {
      * corresponding values in fst and snd. The length of the returned list is
      * {@code Math.min(fst.size(), snd.size())}.
      */
-    public static <T, U, V> List<V> zipIndexWith(
-            final TriFunction<Integer, T, U, V> joiner,
-            final List<T> fst,
-            final List<U> snd) {
-
+    public static <T, U, V> List<V> zipIndexWith(final TriFunction<Integer, T, U, V> joiner, final List<T> fst, final List<U> snd) {
+        final int size = Math.min(fst.size(), snd.size());
         final List<V> ret = new ArrayList<>();
-        for (int i = 0; i < fst.size() && i < snd.size(); i++) {
+        for (int i = 0; i < size; i++) {
             ret.add(joiner.apply(i, fst.get(i), snd.get(i)));
         }
         return ret;
     }
 
+    /**
+     * Create and return a list such that each element is a function of its index and the value at its index in the specified list.
+     * @param xs the list to map
+     * @param mapper the mapping function
+     * @return the mapped list
+     */
     public static <T, U> List<U> mapIndex(final List<T> xs, final BiFunction<Integer, T, U> mapper) {
         final List<U> ret = new ArrayList<>(xs.size());
         for (int i = 0; i < xs.size(); i++) {
@@ -79,6 +87,10 @@ public final class MoreLists {
         return ret;
     }
 
+    /**
+     * @param values the bytes to represent as a list
+     * @return a list representation of the sequence of bytes
+     */
     public static List<Byte> asByteList(final byte... values) {
         final List<Byte> ret = new ArrayList<>();
         for (final byte b : values) {

@@ -65,6 +65,12 @@ public final class Iterators {
         return (Iterator<T>) Iterators.EMPTY;
     }
 
+    /**
+     * Lazily apply the given function to the given iterator.
+     * @param f the function to apply
+     * @param i the iterator to map
+     * @return an iterator which produces the application of the function to the elements of the iterator in the same order
+     */
     public static <T, U> Iterator<U> map(final Function<? super T, ? extends U> f, final Iterator<T> i) {
         return new Iterator<>() {
             @Override

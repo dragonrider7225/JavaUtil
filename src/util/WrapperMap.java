@@ -20,13 +20,17 @@ import org.eclipse.jdt.annotation.Nullable;
  * this map looks like <code>{"A": 5, "B": 4}</code> and <code>this.remove("A")</code> will return
  * it to <code>{"A": 3, "B": 4}</code>. Changes to the backing map will be reflected in this map
  * except where such changes are hidden by calls to {@link #put(Object, Object) this.put(K, V)}.
+ * @param <K> the key type
+ * @param <V> the value type
  */
 @NonNullByDefault({})
 public class WrapperMap<K, V> implements Map<K, V> {
     private final Map<K, V> back;
     private final Map<K, V> others = new HashMap<>();
 
-    @SuppressWarnings("null")
+    /**
+     * @param back the mappings that this map can't remove
+     */
     public WrapperMap(final Map<? extends K, ? extends V> back) {
         this.back = Collections.unmodifiableMap(back);
     }
@@ -43,30 +47,52 @@ public class WrapperMap<K, V> implements Map<K, V> {
         return this.back.isEmpty() && this.others.isEmpty();
     }
 
+    @SuppressWarnings("unlikely-arg-type")
     @Override
     public boolean containsKey(@Nullable final Object key) {
+        if (key == null) {
+            throw new IllegalArgumentException("Expected Key, found null"); //$NON-NLS-1$
+        }
         return this.back.containsKey(key) || this.others.containsKey(key);
     }
 
+    @SuppressWarnings("unlikely-arg-type")
     @Override
     public boolean containsValue(@Nullable final Object value) {
+        if (value == null) {
+            throw new IllegalArgumentException("Expected Value, found null"); //$NON-NLS-1$
+        }
         return this.back.containsValue(value) || this.others.containsValue(value);
     }
 
+    @SuppressWarnings("unlikely-arg-type")
     @Override
     public V get(@Nullable final Object key) {
+        if (key == null) {
+            throw new IllegalArgumentException("Expected Key, found null"); //$NON-NLS-1$
+        }
         return (this.others.containsKey(key) ? this.others : this.back).get(key);
     }
 
     @Override
     public V put(@Nullable final K key, @Nullable final V value) {
+        if (key == null) {
+            throw new IllegalArgumentException("Expected Key, found null"); //$NON-NLS-1$
+        }
+        if (value == null) {
+            throw new IllegalArgumentException("Expected Value, found null"); //$NON-NLS-1$
+        }
         final V ret = this.get(key);
         this.others.put(key, value);
         return ret;
     }
 
+    @SuppressWarnings("unlikely-arg-type")
     @Override
     public V remove(@Nullable final Object key) {
+        if (key == null) {
+            throw new IllegalArgumentException("Expected Key, found null"); //$NON-NLS-1$
+        }
         final V ret = this.get(key);
         this.others.remove(key);
         return ret;
@@ -97,6 +123,7 @@ public class WrapperMap<K, V> implements Map<K, V> {
                 return WrapperMap.this.isEmpty();
             }
 
+            @SuppressWarnings("unlikely-arg-type")
             @Override
             public boolean contains(@Nullable final Object o) {
                 return WrapperMap.this.containsKey(o);
@@ -117,13 +144,11 @@ public class WrapperMap<K, V> implements Map<K, V> {
                 return Iterators.concat(backKeys.iterator(), othersKeys.iterator());
             }
 
-            @SuppressWarnings("null")
             @Override
             public Object[] toArray() {
                 return this.uselessKeys().toArray();
             }
 
-            @SuppressWarnings("null")
             @Override
             public <T> T[] toArray(final T @Nullable [] a) {
                 return this.uselessKeys().toArray(a);
@@ -134,11 +159,13 @@ public class WrapperMap<K, V> implements Map<K, V> {
                 return othersLocal.keySet().add(e);
             }
 
+            @SuppressWarnings("unlikely-arg-type")
             @Override
             public boolean remove(@Nullable final Object o) {
                 return othersLocal.keySet().remove(o);
             }
 
+            @SuppressWarnings("unlikely-arg-type")
             @Override
             public boolean containsAll(@Nullable final Collection<?> c) {
                 return this.uselessKeys().containsAll(c);
@@ -149,11 +176,13 @@ public class WrapperMap<K, V> implements Map<K, V> {
                 return othersLocal.keySet().addAll(c);
             }
 
+            @SuppressWarnings("unlikely-arg-type")
             @Override
             public boolean retainAll(@Nullable final Collection<?> c) {
                 return othersLocal.keySet().retainAll(c);
             }
 
+            @SuppressWarnings("unlikely-arg-type")
             @Override
             public boolean removeAll(@Nullable final Collection<?> c) {
                 return othersLocal.keySet().removeAll(c);
@@ -181,12 +210,12 @@ public class WrapperMap<K, V> implements Map<K, V> {
                 return WrapperMap.this.isEmpty();
             }
 
+            @SuppressWarnings("unlikely-arg-type")
             @Override
             public boolean contains(@Nullable final Object o) {
                 return WrapperMap.this.containsValue(o);
             }
 
-            @SuppressWarnings("null")
             @Override
             public Iterator<V> iterator() {
                 final Iterator<Entry<K, V>> iter = WrapperMap.this.entrySet().iterator();
@@ -208,11 +237,9 @@ public class WrapperMap<K, V> implements Map<K, V> {
                 };
             }
 
-            @SuppressWarnings("null")
             @Override
             public Object[] toArray() {
-                return WrapperMap.this.entrySet().stream().map(e -> e.getValue())
-                        .toArray();
+                return WrapperMap.this.entrySet().stream().map(Entry::getValue).toArray();
             }
 
             @SuppressWarnings({"unchecked", "null"})
@@ -235,16 +262,16 @@ public class WrapperMap<K, V> implements Map<K, V> {
                 return othersLocal.values().add(e);
             }
 
+            @SuppressWarnings("unlikely-arg-type")
             @Override
             public boolean remove(@Nullable final Object o) {
                 return othersLocal.values().remove(o);
             }
 
+            @SuppressWarnings("unlikely-arg-type")
             @Override
             public boolean containsAll(@Nullable final Collection<?> c) {
-                return WrapperMap.this.entrySet().stream().map(Entry::getValue)
-                        .collect(Collectors.toList())
-                        .containsAll(c);
+                return WrapperMap.this.entrySet().stream().map(Entry::getValue).collect(Collectors.toList()).containsAll(c);
             }
 
             @Override
@@ -259,17 +286,11 @@ public class WrapperMap<K, V> implements Map<K, V> {
                 }
                 boolean modified = false;
                 for (final Object o : c) {
-                    @SuppressWarnings("null")
-                    final
-                    Optional<Entry<K, V>> maybeKVPair = othersLocal.entrySet().stream()
-                            .filter(e -> e.getValue() == o)
-                            .findFirst();
+                    final Optional<Entry<K, V>> maybeKVPair = othersLocal.entrySet().stream().filter(e -> e.getValue() == o).findFirst();
                     if (!maybeKVPair.isPresent()) {
                         continue;
                     }
-                    @SuppressWarnings("null")
-                    final
-                    Entry<K, V> kvPair = maybeKVPair.get();
+                    final Entry<K, V> kvPair = maybeKVPair.get();
                     if (backLocal.get(kvPair.getKey()) != othersLocal.get(kvPair.getKey())) {
                         othersLocal.remove(kvPair.getKey());
                         modified = true;
@@ -278,6 +299,7 @@ public class WrapperMap<K, V> implements Map<K, V> {
                 return modified;
             }
 
+            @SuppressWarnings("unlikely-arg-type")
             @Override
             public boolean retainAll(@Nullable final Collection<?> c) {
                 return othersLocal.values().retainAll(c);
@@ -306,14 +328,14 @@ public class WrapperMap<K, V> implements Map<K, V> {
                 return WrapperMap.this.isEmpty();
             }
 
+            @SuppressWarnings("unchecked")
             @Override
             public boolean contains(@Nullable final Object o) {
                 if (!(o instanceof Entry)) {
                     return false;
                 }
-                final Entry<?, ?> e = (Entry<?, ?>) o;
-                return (othersLocal.containsKey(e.getKey()) ? othersLocal : backLocal).entrySet()
-                        .contains(e);
+                final Entry<K, V> e = (Entry<K, V>) o;
+                return (othersLocal.containsKey(e.getKey()) ? othersLocal : backLocal).entrySet().contains(e);
             }
 
             @SuppressWarnings("null")
@@ -357,18 +379,20 @@ public class WrapperMap<K, V> implements Map<K, V> {
                 return othersLocal.entrySet().add(e);
             }
 
+            @SuppressWarnings("unlikely-arg-type")
             @Override
             public boolean remove(@Nullable final Object o) {
                 return othersLocal.entrySet().remove(o);
             }
 
+            @SuppressWarnings("unlikely-arg-type")
             @Override
             public boolean containsAll(@Nullable final Collection<?> c) {
                 if (c == null) {
                     throw new NullPointerException();
                 }
                 for (final Object o : c) {
-                    if (!backLocal.entrySet().contains(o) || !othersLocal.entrySet().contains(o)) {
+                    if (!backLocal.entrySet().contains(o) && !othersLocal.entrySet().contains(o)) {
                         return false;
                     }
                 }
@@ -380,11 +404,13 @@ public class WrapperMap<K, V> implements Map<K, V> {
                 return othersLocal.entrySet().addAll(c);
             }
 
+            @SuppressWarnings("unlikely-arg-type")
             @Override
             public boolean retainAll(@Nullable final Collection<?> c) {
                 return othersLocal.entrySet().retainAll(c);
             }
 
+            @SuppressWarnings("unlikely-arg-type")
             @Override
             public boolean removeAll(@Nullable final Collection<?> c) {
                 return othersLocal.entrySet().removeAll(c);

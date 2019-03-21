@@ -1,6 +1,7 @@
 package util;
 
 import java.util.NoSuchElementException;
+import java.util.function.Function;
 
 import org.eclipse.jdt.annotation.NonNull;
 import org.eclipse.jdt.annotation.Nullable;
@@ -68,6 +69,29 @@ public class Either<@NonNull T, @NonNull U> implements Comparable<Either<T, U>> 
         return this.right.fromJust();
     }
 
+    /**
+     * If this is right, apply the function to this.fromRight(), otherwise return the same left value.
+     * @param f the function to apply to right values
+     * @return the old left value or f applied to the old right value
+     */
+    @SuppressWarnings("unchecked")
+    public final <V> Either<T, V> bind(final Function<U, Either<T, V>> f) {
+        if (this.isLeft()) {
+            return (Either<T, V>) this;
+        }
+        return Maybe.maybe(f.apply(this.fromRight())).fromJust();
+    }
+
+    /**
+     * If this is right, apply the function to this.fromRight() and return as right, otherwise return the same left value.
+     * @param f the function to apply to right values
+     * @return the old left value or f applied to the old right value as a right value
+     */
+    @SuppressWarnings("null")
+    public final <V> Either<T, V> map(final Function<U, V> f) {
+        return this.bind(f.andThen(Either::right));
+    }
+
     @Override
     public boolean equals(@Nullable final Object o) {
         if (this == o) {
@@ -86,8 +110,12 @@ public class Either<@NonNull T, @NonNull U> implements Comparable<Either<T, U>> 
         return false;
     }
 
+    /**
+     * @param other the other Either value
+     * @return whether this and other are the same side and contain the same value according to ==
+     */
     public final boolean shallowEquals(final Either<T, U> other) {
-        return this.left == other.left && this.right == other.right;
+        return this.left.shallowEquals(other.left) && this.right.shallowEquals(other.right);
     }
 
     @Override

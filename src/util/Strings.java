@@ -1,8 +1,11 @@
 package util;
 
-public final class MoreStrings {
-    private MoreStrings() {
-        // No instantiation
+/**
+ * Utilities not present in {@link String}
+ */
+public final class Strings {
+    private Strings() {
+        throw new UnsupportedOperationException("Can't instantiate Strings"); //$NON-NLS-1$
     }
 
     /**
@@ -24,6 +27,6 @@ public final class MoreStrings {
      * @return the longest prefix of the given string with length at most <tt>len</tt>
      */
     public static String take(final int len, final String str) {
-        return (String) MoreStrings.take(len, (CharSequence) str);
+        return (String) Strings.take(len, (CharSequence) str);
     }
 }

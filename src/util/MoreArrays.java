@@ -20,7 +20,6 @@ import java.util.stream.Stream;
 import org.eclipse.jdt.annotation.NonNull;
 import org.eclipse.jdt.annotation.Nullable;
 
-import util.annotation.Pure;
 import util.function.ByteSupplier;
 import util.function.CharSupplier;
 import util.function.FloatSupplier;
@@ -30,12 +29,19 @@ import util.function.ToCharFunction;
 import util.function.ToFloatFunction;
 import util.function.ToShortFunction;
 
+/**
+ * Array utilities not present in {@link java.util.Arrays}
+ */
 public final class MoreArrays {
     private MoreArrays() {
-        // Nothing
+        throw new UnsupportedOperationException("Can't instantiate MoreArrays"); //$NON-NLS-1$
     }
 
-    @Pure
+    /**
+     * @param xs the array of values to search
+     * @param x the value to search for
+     * @return the least value i such that xs[i] == x if such an i exists, -1 otherwise
+     */
     public static <@Nullable T> int indexOf(@Nullable final T[] xs, @Nullable final T x) {
         for (int i = 0; i < xs.length; i++) {
             if (xs[i] == x) {
@@ -45,7 +51,12 @@ public final class MoreArrays {
         return -1;
     }
 
-    @Pure
+    /**
+     * Specialization of {@link #indexOf(Object[], Object)} to booleans.
+     * @param xs the array of values to search
+     * @param x the value to search for
+     * @return the least value i such that xs[i] == x if such an i exists, -1 otherwise
+     */
     public static int indexOf(final boolean[] xs, final boolean x) {
         for (int i = 0; i < xs.length; i++) {
             if (xs[i] == x) {
@@ -55,7 +66,27 @@ public final class MoreArrays {
         return -1;
     }
 
-    @Pure
+    /**
+     * Specialization of {@link #indexOf(Object[], Object)} to characters.
+     * @param xs the array of values to search
+     * @param x the value to search for
+     * @return the least value i such that xs[i] == x if such an i exists, -1 otherwise
+     */
+    public static int indexOf(final char[] xs, final char x) {
+        for (int i = 0; i < xs.length; i++) {
+            if (xs[i] == x) {
+                return i;
+            }
+        }
+        return -1;
+    }
+
+    /**
+     * Specialization of {@link #indexOf(Object[], Object)} to bytes.
+     * @param xs the array of values to search
+     * @param x the value to search for
+     * @return the least value i such that xs[i] == x if such an i exists, -1 otherwise
+     */
     public static int indexOf(final byte[] xs, final byte x) {
         for (int i = 0; i < xs.length; i++) {
             if (xs[i] == x) {
@@ -65,7 +96,12 @@ public final class MoreArrays {
         return -1;
     }
 
-    @Pure
+    /**
+     * Specialization of {@link #indexOf(Object[], Object)} to shorts.
+     * @param xs the array of values to search
+     * @param x the value to search for
+     * @return the least value i such that xs[i] == x if such an i exists, -1 otherwise
+     */
     public static int indexOf(final short[] xs, final short x) {
         for (int i = 0; i < xs.length; i++) {
             if (xs[i] == x) {
@@ -75,7 +111,12 @@ public final class MoreArrays {
         return -1;
     }
 
-    @Pure
+    /**
+     * Specialization of {@link #indexOf(Object[], Object)} to ints.
+     * @param xs the array of values to search
+     * @param x the value to search for
+     * @return the least value i such that xs[i] == x if such an i exists, -1 otherwise
+     */
     public static int indexOf(final int[] xs, final int x) {
         for (int i = 0; i < xs.length; i++) {
             if (xs[i] == x) {
@@ -85,7 +126,12 @@ public final class MoreArrays {
         return -1;
     }
 
-    @Pure
+    /**
+     * Specialization of {@link #indexOf(Object[], Object)} to longs.
+     * @param xs the array of values to search
+     * @param x the value to search for
+     * @return the least value i such that xs[i] == x if such an i exists, -1 otherwise
+     */
     public static int indexOf(final long[] xs, final long x) {
         for (int i = 0; i < xs.length; i++) {
             if (xs[i] == x) {
@@ -95,7 +141,12 @@ public final class MoreArrays {
         return -1;
     }
 
-    @Pure
+    /**
+     * Specialization of {@link #indexOf(Object[], Object)} to floats.
+     * @param xs the array of values to search
+     * @param x the value to search for
+     * @return the least value i such that xs[i] == x if such an i exists, -1 otherwise
+     */
     public static int indexOf(final float[] xs, final float x) {
         for (int i = 0; i < xs.length; i++) {
             if (xs[i] == x) {
@@ -105,7 +156,12 @@ public final class MoreArrays {
         return -1;
     }
 
-    @Pure
+    /**
+     * Specialization of {@link #indexOf(Object[], Object)} to doubles.
+     * @param xs the array of values to search
+     * @param x the value to search for
+     * @return the least value i such that xs[i] == x if such an i exists, -1 otherwise
+     */
     public static int indexOf(final double[] xs, final double x) {
         for (int i = 0; i < xs.length; i++) {
             if (xs[i] == x) {
@@ -115,59 +171,150 @@ public final class MoreArrays {
         return -1;
     }
 
+    /**
+     * Set every element of array to {@link Supplier#get() supplier.get()}. Order of setting elements of array is unspecified.
+     * @param array the array to fill
+     * @param supplier the supplier of elements for the array
+     */
     public static <@NonNull T> void fill(final T[] array, final Supplier<? extends T> supplier) {
         for (int i = 0; i < array.length; i++) {
             array[i] = Maybe.just(supplier.get()).fromJust();
         }
     }
 
+    /**
+     * Specialization of {@link #fill(Object[], Supplier)} to booleans. Set every element of array to {@link Supplier#get() supplier.get()}.
+     * Order of setting elements of array is unspecified.
+     * @param array the array to fill
+     * @param supplier the supplier of elements for the array
+     */
     public static void fill(final boolean[] array, final BooleanSupplier supplier) {
         for (int i = 0; i < array.length; i++) {
             array[i] = supplier.getAsBoolean();
         }
     }
 
+    /**
+     * Specialization of {@link #fill(Object[], Supplier)} to characters. Set every element of array to
+     * {@link Supplier#get() supplier.get()}. Order of setting elements of array is unspecified.
+     * @param array the array to fill
+     * @param supplier the supplier of elements for the array
+     */
+    public static void fill(final char[] array, final CharSupplier supplier) {
+        for (int i = 0; i < array.length; i++) {
+            array[i] = supplier.get();
+        }
+    }
+
+    /**
+     * Specialization of {@link #fill(Object[], Supplier)} to bytes. Set every element of array to {@link Supplier#get() supplier.get()}.
+     * Order of setting elements of array is unspecified.
+     * @param array the array to fill
+     * @param supplier the supplier of elements for the array
+     */
     public static void fill(final byte[] array, final ByteSupplier supplier) {
         for (int i = 0; i < array.length; i++) {
             array[i] = supplier.get();
         }
     }
 
+    /**
+     * Specialization of {@link #fill(Object[], Supplier)} to shorts. Set every element of array to {@link Supplier#get() supplier.get()}.
+     * Order of setting elements of array is unspecified.
+     * @param array the array to fill
+     * @param supplier the supplier of elements for the array
+     */
     public static void fill(final short[] array, final ShortSupplier supplier) {
         for (int i = 0; i < array.length; i++) {
             array[i] = supplier.get();
         }
     }
 
+    /**
+     * Specialization of {@link #fill(Object[], Supplier)} to ints. Set every element of array to {@link Supplier#get() supplier.get()}.
+     * Order of setting elements of array is unspecified.
+     * @param array the array to fill
+     * @param supplier the supplier of elements for the array
+     */
     public static void fill(final int[] array, final IntSupplier supplier) {
         for (int i = 0; i < array.length; i++) {
             array[i] = supplier.getAsInt();
         }
     }
 
+    /**
+     * Specialization of {@link #fill(Object[], Supplier)} to longs. Set every element of array to {@link Supplier#get() supplier.get()}.
+     * Order of setting elements of array is unspecified.
+     * @param array the array to fill
+     * @param supplier the supplier of elements for the array
+     */
     public static void fill(final long[] array, final LongSupplier supplier) {
         for (int i = 0; i < array.length; i++) {
             array[i] = supplier.getAsLong();
         }
     }
 
+    /**
+     * Specialization of {@link #fill(Object[], Supplier)} to floats. Set every element of array to {@link Supplier#get() supplier.get()}.
+     * Order of setting elements of array is unspecified.
+     * @param array the array to fill
+     * @param supplier the supplier of elements for the array
+     */
     public static void fill(final float[] array, final FloatSupplier supplier) {
         for (int i = 0; i < array.length; i++) {
             array[i] = supplier.get();
         }
     }
 
+    /**
+     * Specialization of {@link #fill(Object[], Supplier)} to doubles. Set every element of array to {@link Supplier#get() supplier.get()}.
+     * Order of setting elements of array is unspecified.
+     * @param array the array to fill
+     * @param supplier the supplier of elements for the array
+     */
     public static void fill(final double[] array, final DoubleSupplier supplier) {
         for (int i = 0; i < array.length; i++) {
             array[i] = supplier.getAsDouble();
         }
     }
 
+    /**
+     * Build and return an array of length <tt>len</tt> generated by <tt>arraySupplier</tt> with each element generated by
+     * {@link Supplier#get() valueSupplier.get()}. Order of element generation is unspecified.
+     * @param len the length of the returned array
+     * @param valueSupplier the source of values
+     * @param arraySupplier the source of the frame of the returned array
+     * @return an array of the specified length such that each element was generated by valueSupplier
+     */
     @SuppressWarnings("null")
     public static <A> A[] replicate(final int len, final Supplier<? extends A> valueSupplier, final IntFunction<A[]> arraySupplier) {
         return Stream.generate(valueSupplier).limit(len).toArray(arraySupplier);
     }
 
+    /**
+     * Specialization of {@link #replicate(int, Supplier, IntFunction)} to booleans. Build and return an array of length <tt>len</tt>
+     * generated by <tt>arraySupplier</tt> with each element generated by {@link Supplier#get() valueSupplier.get()}. Order of element
+     * generation is unspecified.
+     * @param len the length of the returned array
+     * @param valueSupplier the source of values
+     * @return an array of the specified length such that each element was generated by valueSupplier
+     */
+    public static boolean[] replicateb(final int len, final BooleanSupplier valueSupplier) {
+        final boolean[] ret = new boolean[len];
+        for (int i = 0; i < len; i++) {
+            ret[i] = valueSupplier.getAsBoolean();
+        }
+        return ret;
+    }
+
+    /**
+     * Specialization of {@link #replicate(int, Supplier, IntFunction)} to characters. Build and return an array of length <tt>len</tt>
+     * generated by <tt>arraySupplier</tt> with each element generated by {@link Supplier#get() valueSupplier.get()}. Order of element
+     * generation is unspecified.
+     * @param len the length of the returned array
+     * @param valueSupplier the source of values
+     * @return an array of the specified length such that each element was generated by valueSupplier
+     */
     public static char[] replicatec(final int len, final CharSupplier valueSupplier) {
         final char[] ret = new char[len];
         for (int i = 0; i < len; i++) {
@@ -176,6 +323,14 @@ public final class MoreArrays {
         return ret;
     }
 
+    /**
+     * Specialization of {@link #replicate(int, Supplier, IntFunction)} to bytes. Build and return an array of length <tt>len</tt>
+     * generated by <tt>arraySupplier</tt> with each element generated by {@link Supplier#get() valueSupplier.get()}. Order of element
+     * generation is unspecified.
+     * @param len the length of the returned array
+     * @param valueSupplier the source of values
+     * @return an array of the specified length such that each element was generated by valueSupplier
+     */
     public static byte[] replicateb(final int len, final ByteSupplier valueSupplier) {
         final byte[] ret = new byte[len];
         for (int i = 0; i < len; i++) {
@@ -184,6 +339,14 @@ public final class MoreArrays {
         return ret;
     }
 
+    /**
+     * Specialization of {@link #replicate(int, Supplier, IntFunction)} to shorts. Build and return an array of length <tt>len</tt>
+     * generated by <tt>arraySupplier</tt> with each element generated by {@link Supplier#get() valueSupplier.get()}. Order of element
+     * generation is unspecified.
+     * @param len the length of the returned array
+     * @param valueSupplier the source of values
+     * @return an array of the specified length such that each element was generated by valueSupplier
+     */
     public static short[] replicates(final int len, final ShortSupplier valueSupplier) {
         final short[] ret = new short[len];
         for (int i = 0; i < len; i++) {
@@ -192,14 +355,38 @@ public final class MoreArrays {
         return ret;
     }
 
+    /**
+     * Specialization of {@link #replicate(int, Supplier, IntFunction)} to ints. Build and return an array of length <tt>len</tt>
+     * generated by <tt>arraySupplier</tt> with each element generated by {@link Supplier#get() valueSupplier.get()}. Order of element
+     * generation is unspecified.
+     * @param len the length of the returned array
+     * @param valueSupplier the source of values
+     * @return an array of the specified length such that each element was generated by valueSupplier
+     */
     public static int[] replicatei(final int len, final IntSupplier valueSupplier) {
-        return IntStream.generate(valueSupplier).limit(len).toArray();
+        return Maybe.maybe(IntStream.generate(valueSupplier).limit(len).toArray()).fromJust();
     }
 
+    /**
+     * Specialization of {@link #replicate(int, Supplier, IntFunction)} to longs. Build and return an array of length <tt>len</tt>
+     * generated by <tt>arraySupplier</tt> with each element generated by {@link Supplier#get() valueSupplier.get()}. Order of element
+     * generation is unspecified.
+     * @param len the length of the returned array
+     * @param valueSupplier the source of values
+     * @return an array of the specified length such that each element was generated by valueSupplier
+     */
     public static long[] replicatel(final int len, final LongSupplier valueSupplier) {
-        return LongStream.generate(valueSupplier).limit(len).toArray();
+        return Maybe.maybe(LongStream.generate(valueSupplier).limit(len).toArray()).fromJust();
     }
 
+    /**
+     * Specialization of {@link #replicate(int, Supplier, IntFunction)} to floats. Build and return an array of length <tt>len</tt>
+     * generated by <tt>arraySupplier</tt> with each element generated by {@link Supplier#get() valueSupplier.get()}. Order of element
+     * generation is unspecified.
+     * @param len the length of the returned array
+     * @param valueSupplier the source of values
+     * @return an array of the specified length such that each element was generated by valueSupplier
+     */
     public static float[] replicatef(final int len, final FloatSupplier valueSupplier) {
         final float[] ret = new float[len];
         for (int i = 0; i < len; i++) {
@@ -208,11 +395,50 @@ public final class MoreArrays {
         return ret;
     }
 
+    /**
+     * Specialization of {@link #replicate(int, Supplier, IntFunction)} to doubles. Build and return an array of length <tt>len</tt>
+     * generated by <tt>arraySupplier</tt> with each element generated by {@link Supplier#get() valueSupplier.get()}. Order of element
+     * generation is unspecified.
+     * @param len the length of the returned array
+     * @param valueSupplier the source of values
+     * @return an array of the specified length such that each element was generated by valueSupplier
+     */
     public static double[] replicated(final int len, final DoubleSupplier valueSupplier) {
-        return DoubleStream.generate(valueSupplier).limit(len).toArray();
+        return Maybe.maybe(DoubleStream.generate(valueSupplier).limit(len).toArray()).fromJust();
     }
 
-    @Pure
+    /**
+     * Box each element of the specified array.
+     * @param xs the array to box
+     * @return an array of boxed values
+     */
+    public static Boolean[] boxed(final boolean[] xs) {
+        @SuppressWarnings("null")
+        final Boolean[] ret = new Boolean[xs.length];
+        for (int i = 0; i < ret.length; i++) {
+            ret[i] = xs[i];
+        }
+        return ret;
+    }
+
+    /**
+     * Unbox each element of the specified array.
+     * @param xs the array to unbox
+     * @return an array of unboxed values
+     */
+    public static boolean[] unboxed(final Boolean[] xs) {
+        final boolean[] ret = new boolean[xs.length];
+        for (int i = 0; i < ret.length; i++) {
+            ret[i] = xs[i];
+        }
+        return ret;
+    }
+
+    /**
+     * Box each element of the specified array.
+     * @param xs the array to box
+     * @return an array of boxed values
+     */
     public static Character[] boxed(final char[] xs) {
         @SuppressWarnings("null")
         final Character[] ret = new Character[xs.length];
@@ -222,7 +448,11 @@ public final class MoreArrays {
         return ret;
     }
 
-    @Pure
+    /**
+     * Unbox each element of the specified array.
+     * @param xs the array to unbox
+     * @return an array of unboxed values
+     */
     public static char[] unboxed(final Character[] xs) {
         final char[] ret = new char[xs.length];
         for (int i = 0; i < ret.length; i++) {
@@ -231,7 +461,11 @@ public final class MoreArrays {
         return ret;
     }
 
-    @Pure
+    /**
+     * Box each element of the specified array.
+     * @param xs the array to box
+     * @return an array of boxed values
+     */
     public static Byte[] boxed(final byte[] xs) {
         @SuppressWarnings("null")
         final Byte[] ret = new Byte[xs.length];
@@ -241,7 +475,11 @@ public final class MoreArrays {
         return ret;
     }
 
-    @Pure
+    /**
+     * Unbox each element of the specified array.
+     * @param xs the array to unbox
+     * @return an array of unboxed values
+     */
     public static byte[] unboxed(final Byte[] xs) {
         final byte[] ret = new byte[xs.length];
         for (int i = 0; i < ret.length; i++) {
@@ -250,7 +488,11 @@ public final class MoreArrays {
         return ret;
     }
 
-    @Pure
+    /**
+     * Box each element of the specified array.
+     * @param xs the array to box
+     * @return an array of boxed values
+     */
     public static Short[] boxed(final short[] xs) {
         @SuppressWarnings("null")
         final Short[] ret = new Short[xs.length];
@@ -260,7 +502,11 @@ public final class MoreArrays {
         return ret;
     }
 
-    @Pure
+    /**
+     * Unbox each element of the specified array.
+     * @param xs the array to unbox
+     * @return an array of unboxed values
+     */
     public static short[] unboxed(final Short[] xs) {
         final short[] ret = new short[xs.length];
         for (int i = 0; i < ret.length; i++) {
@@ -269,7 +515,11 @@ public final class MoreArrays {
         return ret;
     }
 
-    @Pure
+    /**
+     * Box each element of the specified array.
+     * @param xs the array to box
+     * @return an array of boxed values
+     */
     public static Integer[] boxed(final int[] xs) {
         @SuppressWarnings("null")
         final Integer[] ret = new Integer[xs.length];
@@ -279,7 +529,11 @@ public final class MoreArrays {
         return ret;
     }
 
-    @Pure
+    /**
+     * Unbox each element of the specified array.
+     * @param xs the array to unbox
+     * @return an array of unboxed values
+     */
     public static int[] unboxed(final Integer[] xs) {
         final int[] ret = new int[xs.length];
         for (int i = 0; i < ret.length; i++) {
@@ -288,7 +542,11 @@ public final class MoreArrays {
         return ret;
     }
 
-    @Pure
+    /**
+     * Box each element of the specified array.
+     * @param xs the array to box
+     * @return an array of boxed values
+     */
     public static Long[] boxed(final long[] xs) {
         @SuppressWarnings("null")
         final Long[] ret = new Long[xs.length];
@@ -298,7 +556,11 @@ public final class MoreArrays {
         return ret;
     }
 
-    @Pure
+    /**
+     * Unbox each element of the specified array.
+     * @param xs the array to unbox
+     * @return an array of unboxed values
+     */
     public static long[] unboxed(final Long[] xs) {
         final long[] ret = new long[xs.length];
         for (int i = 0; i < ret.length; i++) {
@@ -307,7 +569,11 @@ public final class MoreArrays {
         return ret;
     }
 
-    @Pure
+    /**
+     * Box each element of the specified array.
+     * @param xs the array to box
+     * @return an array of boxed values
+     */
     public static Float[] boxed(final float[] xs) {
         @SuppressWarnings("null")
         final Float[] ret = new Float[xs.length];
@@ -317,7 +583,11 @@ public final class MoreArrays {
         return ret;
     }
 
-    @Pure
+    /**
+     * Unbox each element of the specified array.
+     * @param xs the array to unbox
+     * @return an array of unboxed values
+     */
     public static float[] unboxed(final Float[] xs) {
         final float[] ret = new float[xs.length];
         for (int i = 0; i < ret.length; i++) {
@@ -326,7 +596,11 @@ public final class MoreArrays {
         return ret;
     }
 
-    @Pure
+    /**
+     * Box each element of the specified array.
+     * @param xs the array to box
+     * @return an array of boxed values
+     */
     public static Double[] boxed(final double[] xs) {
         @SuppressWarnings("null")
         final Double[] ret = new Double[xs.length];
@@ -336,7 +610,11 @@ public final class MoreArrays {
         return ret;
     }
 
-    @Pure
+    /**
+     * Unbox each element of the specified array.
+     * @param xs the array to unbox
+     * @return an array of unboxed values
+     */
     public static double[] unboxed(final Double[] xs) {
         final double[] ret = new double[xs.length];
         for (int i = 0; i < ret.length; i++) {
@@ -350,7 +628,7 @@ public final class MoreArrays {
      * @param rng the random number generator to use
      * @return a randomly selected element of the given array
      */
-    public static byte randEl(final @Pure byte[] var1, final Random rng) {
+    public static byte randEl(final  byte[] var1, final Random rng) {
         return var1[rng.nextInt(var1.length)];
     }
 
@@ -359,7 +637,7 @@ public final class MoreArrays {
      * @param rng the random number generator to use
      * @return a randomly selected element of the given array
      */
-    public static short randEl(final @Pure short[] var1, final Random rng) {
+    public static short randEl(final  short[] var1, final Random rng) {
         return var1[rng.nextInt(var1.length)];
     }
 
@@ -368,7 +646,7 @@ public final class MoreArrays {
      * @param rng the random number generator to use
      * @return a randomly selected element of the given array
      */
-    public static int randEl(final @Pure int[] var1, final Random rng) {
+    public static int randEl(final  int[] var1, final Random rng) {
         return var1[rng.nextInt(var1.length)];
     }
 
@@ -377,7 +655,7 @@ public final class MoreArrays {
      * @param rng the random number generator to use
      * @return a randomly selected element of the given array
      */
-    public static long randEl(final @Pure long[] var1, final Random rng) {
+    public static long randEl(final  long[] var1, final Random rng) {
         return var1[rng.nextInt(var1.length)];
     }
 
@@ -386,7 +664,7 @@ public final class MoreArrays {
      * @param rng the random number generator to use
      * @return a randomly selected element of the given array
      */
-    public static float randEl(final @Pure float[] var1, final Random rng) {
+    public static float randEl(final  float[] var1, final Random rng) {
         return var1[rng.nextInt(var1.length)];
     }
 
@@ -395,7 +673,7 @@ public final class MoreArrays {
      * @param rng the random number generator to use
      * @return a randomly selected element of the given array
      */
-    public static double randEl(final @Pure double[] var1, final Random rng) {
+    public static double randEl(final  double[] var1, final Random rng) {
         return var1[rng.nextInt(var1.length)];
     }
 
@@ -404,7 +682,7 @@ public final class MoreArrays {
      * @param rng the random number generator to use
      * @return a randomly selected element of the given array
      */
-    public static <@Nullable E> E randEl(final @Pure @Nullable E[] arr, final Random rng) {
+    public static <@Nullable E> E randEl(final  @Nullable E[] arr, final Random rng) {
         return arr[rng.nextInt(arr.length)];
     }
 
@@ -530,8 +808,13 @@ public final class MoreArrays {
         return ret;
     }
 
+    /**
+     * Stream a float array.
+     * @param xs the array to stream
+     * @return a stream based on the specified array
+     */
     @SuppressWarnings("null")
-    public static Stream<Float> stream(final @Pure float[] xs) {
+    public static Stream<Float> stream(final float[] xs) {
         return Arrays.stream(MoreArrays.boxed(xs));
     }
 
@@ -541,7 +824,6 @@ public final class MoreArrays {
      * @param xs the source array
      * @return a copy of the source array
      */
-    @Pure
     @SuppressWarnings("null")
     public static char[] clone(final char[] xs) {
         return Arrays.copyOf(xs, xs.length);
@@ -553,7 +835,6 @@ public final class MoreArrays {
      * @param xs the source array
      * @return a copy of the source array
      */
-    @Pure
     @SuppressWarnings("null")
     public static byte[] clone(final byte[] xs) {
         return Arrays.copyOf(xs, xs.length);
@@ -565,7 +846,6 @@ public final class MoreArrays {
      * @param xs the source array
      * @return a copy of the source array
      */
-    @Pure
     @SuppressWarnings("null")
     public static short[] clone(final short[] xs) {
         return Arrays.copyOf(xs, xs.length);
@@ -577,7 +857,6 @@ public final class MoreArrays {
      * @param xs the source array
      * @return a copy of the source array
      */
-    @Pure
     @SuppressWarnings("null")
     public static int[] clone(final int[] xs) {
         return Arrays.copyOf(xs, xs.length);
@@ -589,7 +868,6 @@ public final class MoreArrays {
      * @param xs the source array
      * @return a copy of the source array
      */
-    @Pure
     @SuppressWarnings("null")
     public static long[] clone(final long[] xs) {
         return Arrays.copyOf(xs, xs.length);
@@ -601,7 +879,6 @@ public final class MoreArrays {
      * @param xs the source array
      * @return a copy of the source array
      */
-    @Pure
     @SuppressWarnings("null")
     public static float[] clone(final float[] xs) {
         return Arrays.copyOf(xs, xs.length);
@@ -613,7 +890,6 @@ public final class MoreArrays {
      * @param xs the source array
      * @return a copy of the source array
      */
-    @Pure
     @SuppressWarnings("null")
     public static double[] clone(final double[] xs) {
         return Arrays.copyOf(xs, xs.length);
@@ -625,7 +901,6 @@ public final class MoreArrays {
      * @param xs the source array
      * @return a copy of the source array
      */
-    @Pure
     @SuppressWarnings("null")
     public static <T> T[] clone(final T[] xs) {
         return Arrays.copyOf(xs, xs.length);

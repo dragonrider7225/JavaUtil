@@ -6,6 +6,7 @@ package util.function;
  * @param <U> the output type
  * @param <X> the exception type
  */
+@SuppressWarnings("unused") // Eclipse Java source analyzer mistakenly determines that X is unused
 @FunctionalInterface
 public interface ExFunction<T, U, X extends Throwable> {
     /**
