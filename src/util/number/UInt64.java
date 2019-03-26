@@ -1,8 +1,8 @@
 package util.number;
 
-import java.util.stream.LongStream;
+import edu.umd.cs.findbugs.annotations.Nullable;
 
-import org.eclipse.jdt.annotation.Nullable;
+import java.util.stream.LongStream;
 
 import util.Pair;
 
@@ -16,7 +16,6 @@ public final class UInt64 extends Number implements Comparable<UInt64> {
     private static final long serialVersionUID = 8500011781552339262L;
     private static final long MIN_SIGNED = 0xFFFF_FFFF_FFFF_FF80L;
     private static final long MAX_SIGNED = 0x0000_0000_0000_007FL;
-    @SuppressWarnings("null")
     private static final UInt64[] cache = LongStream.rangeClosed(UInt64.MIN_SIGNED, UInt64.MAX_SIGNED).mapToObj(UInt64::new)
             .toArray(UInt64[]::new);
     /**

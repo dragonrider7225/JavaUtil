@@ -15,7 +15,6 @@ public final class Pair<T, U> {
      * @param fst the first element of the pair
      * @param snd the second element of the pair
      */
-    @SuppressWarnings({"null", "unused"})
     public Pair(final T fst, final U snd) {
         if (fst == null) {
             throw new IllegalArgumentException("Expected object for first element of pair, found null"); //$NON-NLS-1$
@@ -48,10 +47,10 @@ public final class Pair<T, U> {
      */
     @SuppressWarnings("unchecked")
     public <V> Pair<V, U> mapFst(final Function<? super T, ? extends V> f) {
-        @SuppressWarnings("null")
         final V retFst = f.apply(this.fst);
         if (retFst == this.fst) {
-            return (Pair<V, U>) this;
+            return (Pair<V, U>) this; // if retFst is this.fst, then this.fst is an instance of V, so it's safe to interpret the field as V
+                                      // when reading, and since fst is immutable, it can't be written.
         }
         return new Pair<>(retFst, this.snd);
     }
@@ -63,7 +62,6 @@ public final class Pair<T, U> {
      */
     @SuppressWarnings("unchecked")
     public <V> Pair<T, V> mapSnd(final Function<? super U, ? extends V> f) {
-        @SuppressWarnings("null")
         final V retSnd = f.apply(this.snd);
         if (retSnd == this.snd) {
             return (Pair<T, V>) this;
@@ -78,9 +76,7 @@ public final class Pair<T, U> {
      */
     @SuppressWarnings("unchecked")
     public <V, W> Pair<V, W> map(final Function<? super T, ? extends V> fFst, final Function<? super U, ? extends W> fSnd) {
-        @SuppressWarnings("null")
         final V retFst = fFst.apply(this.fst);
-        @SuppressWarnings("null")
         final W retSnd = fSnd.apply(this.snd);
         if (retFst == this.fst && retSnd == this.snd) {
             return (Pair<V, W>) this;
@@ -94,7 +90,6 @@ public final class Pair<T, U> {
      */
     @SuppressWarnings("unchecked")
     public <V, W> Pair<V, W> map(final Function<Pair<? super T, ? super U>, Pair<? extends V, ? extends W>> f) {
-        @SuppressWarnings("null")
         final Pair<? extends V, ? extends W> ret = f.apply(this);
         if (ret.fst == this.fst && ret.snd == this.snd) {
             return (Pair<V, W>) this;

@@ -25,7 +25,6 @@ public interface BooleanUnaryOperator extends UnaryOperator<Boolean> {
      */
     BooleanUnaryOperator NOT = b -> !b;
 
-    @SuppressWarnings({"null", "unused"})
     @Override
     default Boolean apply(final Boolean value) {
         if (value == null) {

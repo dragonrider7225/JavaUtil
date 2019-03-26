@@ -1,5 +1,8 @@
 package util;
 
+import edu.umd.cs.findbugs.annotations.NonNull;
+import edu.umd.cs.findbugs.annotations.Nullable;
+
 import java.util.Arrays;
 import java.util.Collection;
 import java.util.Iterator;
@@ -10,9 +13,6 @@ import java.util.function.Predicate;
 import java.util.function.UnaryOperator;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
-
-import org.eclipse.jdt.annotation.NonNull;
-import org.eclipse.jdt.annotation.Nullable;
 
 import util.number.UInt32;
 
@@ -31,7 +31,7 @@ public final class ConcatenatedList<E> implements AnnotatedNonNullList<Concatena
         this.lists = lists;
     }
 
-    @SuppressWarnings({"null", "unchecked"})
+    @SuppressWarnings("unchecked")
     private Stream<List<E>> subListStream() {
         return Arrays.stream(this.lists).<List<E>>map(list -> (List<E>) list);
     }
@@ -52,7 +52,6 @@ public final class ConcatenatedList<E> implements AnnotatedNonNullList<Concatena
         return this.subListStream().anyMatch(list -> list.contains(o));
     }
 
-    @SuppressWarnings("null")
     @Override
     public Iterator<E> iterator() {
         return this.subListStream().map(List::iterator).reduce(Iterators.empty(), Iterators::concat);
@@ -64,22 +63,22 @@ public final class ConcatenatedList<E> implements AnnotatedNonNullList<Concatena
     }
 
     @Override
-    public Pair<ConcatenatedList<E>, Maybe<@NonNull E>> remove(final UInt32 index) {
+    public Pair<ConcatenatedList<E>, Maybe<E>> remove(final UInt32 index) {
         throw new UnsupportedOperationException();
     }
 
     @Override
-    public Pair<ConcatenatedList<E>, Maybe<@NonNull E>> remove(final Object o) {
+    public Pair<ConcatenatedList<E>, Maybe<E>> remove(final Object o) {
         throw new UnsupportedOperationException();
     }
 
     @Override
-    public Pair<ConcatenatedList<E>, Maybe<@NonNull E>> pureRemove(final UInt32 index) {
+    public Pair<ConcatenatedList<E>, Maybe<E>> pureRemove(final UInt32 index) {
         throw new UnsupportedOperationException();
     }
 
     @Override
-    public Pair<ConcatenatedList<E>, Maybe<@NonNull E>> pureRemove(final Object o) {
+    public Pair<ConcatenatedList<E>, Maybe<E>> pureRemove(final Object o) {
         throw new UnsupportedOperationException();
     }
 
@@ -140,13 +139,13 @@ public final class ConcatenatedList<E> implements AnnotatedNonNullList<Concatena
     }
 
     @Override
-    public Maybe<@NonNull E> get(final UInt32 index) {
+    public Maybe<E> get(final UInt32 index) {
         return Maybe
                 .just(this.stream().sequential().skip(index.intValue() - 1).findFirst().orElseThrow(() -> new IndexOutOfBoundsException()));
     }
 
     @Override
-    public Pair<ConcatenatedList<E>, Maybe<@NonNull E>> set(final UInt32 index, final E element) {
+    public Pair<ConcatenatedList<E>, Maybe<E>> set(final UInt32 index, final E element) {
         throw new UnsupportedOperationException();
     }
 
@@ -155,7 +154,7 @@ public final class ConcatenatedList<E> implements AnnotatedNonNullList<Concatena
         throw new UnsupportedOperationException();
     }
 
-    @SuppressWarnings({"null", "unlikely-arg-type"})
+    @SuppressWarnings("unlikely-arg-type")
     @Override
     public Maybe<UInt32> indexOf(final Object o) {
         return Maybe
@@ -173,7 +172,7 @@ public final class ConcatenatedList<E> implements AnnotatedNonNullList<Concatena
                 .map(UInt32::asUnsigned);
     }
 
-    @SuppressWarnings({"null", "unlikely-arg-type"})
+    @SuppressWarnings("unlikely-arg-type")
     @Override
     public Maybe<UInt32> lastIndexOf(@Nullable final Object o) {
         return Maybe
@@ -193,47 +192,45 @@ public final class ConcatenatedList<E> implements AnnotatedNonNullList<Concatena
 
     @Override
     public ListIterator<E> listIterator(final UInt32 index) {
+        @SuppressWarnings("unchecked")
+        final ListIterator<E>[] liters = ConcatenatedList.this.subListStream().toArray(len -> (ListIterator<E>[]) new ListIterator[len]);
         return new ListIterator<>() {
             private int actualIndex = index.intValue();
             private int list;
             private final boolean nexted = false;
             private final boolean previoused = false;
-            @SuppressWarnings({"null", "unchecked"})
-            private final ListIterator<E>[] liters = ConcatenatedList.this.subListStream()
-                    .toArray(len -> (ListIterator<E>[]) new ListIterator[len]);
 
             {
                 this.list = 0;
                 int listIdx = index.intValue();
                 while (ConcatenatedList.this.lists[this.list].size() <= listIdx) {
-                    while (this.liters[this.list].hasNext()) {
-                        this.liters[this.list].next();
+                    while (liters[this.list].hasNext()) {
+                        liters[this.list].next();
                     }
-                    listIdx -= this.liters[this.list].nextIndex();
+                    listIdx -= liters[this.list].nextIndex();
                 }
                 for (int i = 0; i < listIdx; i++) {
-                    this.liters[this.list].next();
+                    liters[this.list].next();
                 }
             }
 
             @Override
             public boolean hasNext() {
-                if (this.list < this.liters.length) { // Current iterator exists
+                if (this.list < liters.length) { // Current iterator exists
                     // Current iterator is not exhausted or next iterator exists
-                    return this.liters[this.list].hasNext() || this.list + 1 < this.liters.length;
+                    return liters[this.list].hasNext() || this.list + 1 < liters.length;
                 }
                 return false;
             }
 
-            @SuppressWarnings("null")
             @Override
             public @NonNull E next() {
                 if (this.hasNext()) {
-                    if (!this.liters[this.list].hasNext()) {
+                    if (!liters[this.list].hasNext()) {
                         this.list++;
                     }
                     this.actualIndex++;
-                    return this.liters[this.list].next();
+                    return liters[this.list].next();
                 }
                 throw new NoSuchElementException();
             }
@@ -242,20 +239,19 @@ public final class ConcatenatedList<E> implements AnnotatedNonNullList<Concatena
             public boolean hasPrevious() {
                 if (0 <= this.list) { // Current iterator exists
                     // Current iterator is not exhausted or previous iterator exists
-                    return this.liters[this.list].hasPrevious() || 0 <= this.list - 1;
+                    return liters[this.list].hasPrevious() || 0 <= this.list - 1;
                 }
                 return false;
             }
 
-            @SuppressWarnings("null")
             @Override
             public @NonNull E previous() {
                 if (this.hasPrevious()) {
-                    if (!this.liters[this.list].hasPrevious()) {
+                    if (!liters[this.list].hasPrevious()) {
                         this.list--;
                     }
                     this.actualIndex--;
-                    return this.liters[this.list].previous();
+                    return liters[this.list].previous();
                 }
                 throw new NoSuchElementException();
             }
@@ -290,7 +286,6 @@ public final class ConcatenatedList<E> implements AnnotatedNonNullList<Concatena
         };
     }
 
-    @SuppressWarnings("null")
     @Override
     public Stream<E> stream() {
         return this.subListStream().flatMap(List::stream);

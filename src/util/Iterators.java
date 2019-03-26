@@ -51,7 +51,6 @@ public final class Iterators {
      * @return the concatenation of the argument iterators in the order specified
      */
     @SafeVarargs
-    @SuppressWarnings("null")
     public static <T> Iterator<T> concat(final Iterator<T>... iters) {
         return Arrays.stream(iters).reduce(Iterators.empty(), Iterators::concat);
     }
@@ -78,7 +77,6 @@ public final class Iterators {
                 return i.hasNext();
             }
 
-            @SuppressWarnings("null")
             @Override
             public U next() {
                 return f.apply(i.next());

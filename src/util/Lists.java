@@ -5,8 +5,6 @@ import java.util.List;
 import java.util.Random;
 import java.util.function.BiFunction;
 
-import org.eclipse.jdt.annotation.NonNull;
-
 import util.function.TriFunction;
 
 /**
@@ -24,7 +22,7 @@ public final class Lists {
      * @param snd the second elements of the pairs in the returned list
      * @return the list of c<sub>i</sub>=(fst.get(i), snd.get(i)) such that 0 &le; i &lt; min(fst.size(), snd.size())
      */
-    public static <@NonNull T, @NonNull U> List<Pair<T, U>> zip(final List<T> fst, final List<U> snd) {
+    public static <T, U> List<Pair<T, U>> zip(final List<T> fst, final List<U> snd) {
         return Lists.zipWith(Pair::new, fst, snd);
     }
 
@@ -47,7 +45,7 @@ public final class Lists {
      * @param snd the second elements of the pairs in the returned list
      * @return the list of c<sub>i</sub>=(i, (fst.get(i), snd.get(i))) such that 0 &le; i &lt; min(fst.size(), snd.size())
      */
-    public static <@NonNull T, @NonNull U> List<Pair<Integer, Pair<T, U>>> zipIndex(final List<T> fst, final List<U> snd) {
+    public static <T, U> List<Pair<Integer, Pair<T, U>>> zipIndex(final List<T> fst, final List<U> snd) {
         return Lists.zipIndexWith((i, f, s) -> new Pair<>(i, new Pair<>(f, s)), fst, snd);
     }
 

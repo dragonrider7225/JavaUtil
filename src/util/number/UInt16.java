@@ -1,8 +1,8 @@
 package util.number;
 
-import java.util.stream.IntStream;
+import edu.umd.cs.findbugs.annotations.Nullable;
 
-import org.eclipse.jdt.annotation.Nullable;
+import java.util.stream.IntStream;
 
 import util.Pair;
 
@@ -16,7 +16,6 @@ public final class UInt16 extends Number implements Comparable<UInt16> {
     private static final long serialVersionUID = 3104615960713072715L;
     private static final short MIN_SIGNED = (short) 0xFF80;
     private static final short MAX_SIGNED = (short) 0x007F;
-    @SuppressWarnings("null")
     private static final UInt16[] cache = IntStream.rangeClosed(UInt16.MIN_SIGNED, UInt16.MAX_SIGNED).mapToObj(UInt16::new)
             .toArray(UInt16[]::new);
     /**

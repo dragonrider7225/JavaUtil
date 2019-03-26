@@ -3,15 +3,14 @@ package util;
 import java.util.NoSuchElementException;
 import java.util.function.Function;
 
-import org.eclipse.jdt.annotation.NonNull;
-import org.eclipse.jdt.annotation.Nullable;
+import edu.umd.cs.findbugs.annotations.Nullable;
 
 /**
  * @note this class has a natural ordering that is inconsistent with equals
  * @param <T> the left type
  * @param <U> the right type
  */
-public class Either<@NonNull T, @NonNull U> implements Comparable<Either<T, U>> {
+public class Either<T, U> implements Comparable<Either<T, U>> {
     private Maybe<T> left = Maybe.nothing();
     private Maybe<U> right = Maybe.nothing();
 
@@ -27,7 +26,7 @@ public class Either<@NonNull T, @NonNull U> implements Comparable<Either<T, U>> 
      * @param value the value contained in the returned object. Must be non-null.
      * @return a "Left" object containing the passed value
      */
-    public static <@NonNull T, @NonNull U> Either<T, U> left(final T value) {
+    public static <T, U> Either<T, U> left(final T value) {
         return new Either<>(true, value);
     }
 
@@ -35,7 +34,7 @@ public class Either<@NonNull T, @NonNull U> implements Comparable<Either<T, U>> 
      * @param value the value contained in the returned object. Must be non-null
      * @return a "Right" object containing the passed value
      */
-    public static <@NonNull T, @NonNull U> Either<T, U> right(final U value) {
+    public static <T, U> Either<T, U> right(final U value) {
         return new Either<>(value);
     }
 
@@ -87,7 +86,6 @@ public class Either<@NonNull T, @NonNull U> implements Comparable<Either<T, U>> 
      * @param f the function to apply to right values
      * @return the old left value or f applied to the old right value as a right value
      */
-    @SuppressWarnings("null")
     public final <V> Either<T, V> map(final Function<U, V> f) {
         return this.bind(f.andThen(Either::right));
     }

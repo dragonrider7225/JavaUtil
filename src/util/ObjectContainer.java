@@ -4,7 +4,7 @@ import java.text.MessageFormat;
 import java.util.concurrent.locks.ReentrantReadWriteLock;
 import java.util.function.UnaryOperator;
 
-import org.eclipse.jdt.annotation.Nullable;
+import edu.umd.cs.findbugs.annotations.Nullable;
 
 /**
  * A container type primarily intended for use with {@link java.util.stream.Stream#forEachOrdered}, although if the operator is commutative
@@ -24,7 +24,6 @@ public class ObjectContainer<T> {
      * @param value the value to initialize this container with
      * @param cls the class representing the type of value this container accepts
      */
-    @SuppressWarnings({"null", "unused"})
     public ObjectContainer(final T value, final Class<T> cls) {
         if (cls == null) {
             throw new IllegalArgumentException("Expected Class, found null"); //$NON-NLS-1$
@@ -63,7 +62,6 @@ public class ObjectContainer<T> {
      * @param value the value to set this container to. Must not be null
      * @return this
      */
-    @SuppressWarnings({"null", "unused"})
     public final ObjectContainer<T> set(final T value) {
         if (value == null) {
             throw new IllegalArgumentException(MessageFormat.format("Expected {0}, found null", this.cls.getSimpleName())); //$NON-NLS-1$
@@ -86,7 +84,6 @@ public class ObjectContainer<T> {
      * @param op the updater function. Must not return null
      * @return this
      */
-    @SuppressWarnings({"null", "unused"})
     public ObjectContainer<T> atomicUpdate(final UnaryOperator<T> op) {
         if (op == null) {
             throw new IllegalArgumentException("Expected UnaryOperator, found null"); //$NON-NLS-1$
@@ -117,18 +114,29 @@ public class ObjectContainer<T> {
     public final boolean shallowEquals(final ObjectContainer<?> other) {
         if (this.synchronize) {
             this.lock.readLock().lock();
+            try {
+                if (other.synchronize) {
+                    other.lock.readLock().lock();
+                    try {
+                        return this.value == other.value;
+                    } finally {
+                        other.lock.readLock().unlock();
+                    }
+                }
+                return this.value == other.value;
+            } finally {
+                this.lock.readLock().unlock();
+            }
         }
         if (other.synchronize) {
             other.lock.readLock().lock();
+            try {
+                return this.value == other.value;
+            } finally {
+                other.lock.readLock().unlock();
+            }
         }
-            final boolean ret = this.value == other.value;
-        if (other.synchronize) {
-            other.lock.readLock().unlock();
-        }
-        if (this.synchronize) {
-            this.lock.readLock().unlock();
-        }
-        return ret;
+        return this.value == other.value;
     }
 
     @Override
@@ -139,18 +147,29 @@ public class ObjectContainer<T> {
         final ObjectContainer<?> other = (ObjectContainer<?>) o;
         if (this.synchronize) {
             this.lock.readLock().lock();
+            try {
+                if (other.synchronize) {
+                    other.lock.readLock().lock();
+                    try {
+                        return this.value.equals(other.value);
+                    } finally {
+                        other.lock.readLock().unlock();
+                    }
+                }
+                return this.value.equals(other.value);
+            } finally {
+                this.lock.readLock().unlock();
+            }
         }
         if (other.synchronize) {
             other.lock.readLock().lock();
+            try {
+                return this.value.equals(other.value);
+            } finally {
+                other.lock.readLock().unlock();
+            }
         }
-            final boolean ret = this.value.equals(other.value);
-        if (other.synchronize) {
-            other.lock.readLock().unlock();
-        }
-        if (this.synchronize) {
-            this.lock.readLock().unlock();
-        }
-        return ret;
+        return this.value.equals(other.value);
     }
 
     @Override

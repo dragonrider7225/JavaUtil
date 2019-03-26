@@ -3,8 +3,6 @@ package util.function;
 import java.util.function.BiFunction;
 import java.util.function.Function;
 
-import org.eclipse.jdt.annotation.NonNull;
-
 /**
  * A function of three arguments. This function can be partially applied by supplying fewer than three arguments.
  * @param <T> the type of the first argument
@@ -13,7 +11,7 @@ import org.eclipse.jdt.annotation.NonNull;
  * @param <R> the type of the returned value
  */
 @FunctionalInterface
-public interface TriFunction<@NonNull T, U, V, R> extends Function<T, BiFunction<U, V, R>>, BiFunction<T, U, Function<V, R>> {
+public interface TriFunction<T, U, V, R> extends Function<T, BiFunction<U, V, R>>, BiFunction<T, U, Function<V, R>> {
     /**
      * @param fst the first argument
      * @param snd the second argument

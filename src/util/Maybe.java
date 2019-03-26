@@ -12,16 +12,15 @@ import java.util.function.Predicate;
 import java.util.function.Supplier;
 import java.util.stream.Stream;
 
-import org.eclipse.jdt.annotation.NonNull;
-import org.eclipse.jdt.annotation.Nullable;
-
 import util.function.ExFunction;
+
+import edu.umd.cs.findbugs.annotations.Nullable;
 
 /**
  * A class that represents the possibility of the lack of a value.
  * @param <T> the type of the value that may be present
  */
-public class Maybe<T> implements Iterable<@NonNull T> {
+public class Maybe<T> implements Iterable<T> {
     private static final Maybe<?> NOTHING = new Maybe<>();
     @Nullable
     private final T value;
@@ -38,7 +37,7 @@ public class Maybe<T> implements Iterable<@NonNull T> {
      * @return an object which contains no value
      */
     @SuppressWarnings("unchecked")
-    public static <@NonNull T> Maybe<T> nothing() {
+    public static <T> Maybe<T> nothing() {
         return (Maybe<T>) Maybe.NOTHING;
     }
 
@@ -47,7 +46,7 @@ public class Maybe<T> implements Iterable<@NonNull T> {
      * @param <T> the type of the value
      * @return an object which contains the given value
      */
-    public static <@NonNull T> Maybe<T> just(final T value) {
+    public static <T> Maybe<T> just(final T value) {
         return new Maybe<>(value);
     }
 
@@ -56,7 +55,7 @@ public class Maybe<T> implements Iterable<@NonNull T> {
      * @param <T> the type of the value
      * @return if value != null then {@link #just(Object) just(value)} else {@link #nothing()}
      */
-    public static <@NonNull T> Maybe<T> maybe(@Nullable final T value) {
+    public static <T> Maybe<T> maybe(@Nullable final T value) {
         if (value == null) {
             return Maybe.nothing();
         }
@@ -70,8 +69,7 @@ public class Maybe<T> implements Iterable<@NonNull T> {
      * @return if wrapper != null && {@link Optional#isPresent() wrapper.isPresent()} then {@link #just(Object) just(wrapper.get())}
      * else {@link #nothing()}
      */
-    @SuppressWarnings("null")
-    public static <@NonNull T> Maybe<T> fromOptional(final @Nullable Optional<T> wrapper) {
+    public static <T> Maybe<T> fromOptional(final @Nullable Optional<T> wrapper) {
         if (wrapper == null) {
             return Maybe.nothing();
         }
@@ -109,12 +107,11 @@ public class Maybe<T> implements Iterable<@NonNull T> {
      * @param defaultValue the value to return if this object does not contain a value
      * @return if {@link #isJust()} then {@link #fromJust()} else defaultValue
      */
-    @SuppressWarnings({"null", "unused"}) // Can't return null because fromMaybeNullable returns null only if argument is null
     public final T fromMaybe(final T defaultValue) {
         if (defaultValue == null) { // If user respects nullness annotations, always false
             throw new IllegalArgumentException("Expected object, found null"); //$NON-NLS-1$
         }
-        return (@NonNull T) this.fromMaybeNullable(defaultValue);
+        return this.fromMaybeNullable(defaultValue);
     }
 
     /**
@@ -130,7 +127,6 @@ public class Maybe<T> implements Iterable<@NonNull T> {
      * @param defaultSupplier the supplier of the value to return if {@link #isNothing()}
      * @return if {@link #isNothing()} then {@link Supplier#get() defaultSupplier.get()} else {@link #fromJust()}
      */
-    @SuppressWarnings("null")
     public final T fromMaybeGet(final Supplier<? extends T> defaultSupplier) {
         if (this.isNothing()) {
             return defaultSupplier.get();
@@ -154,7 +150,6 @@ public class Maybe<T> implements Iterable<@NonNull T> {
      * @return if {@link #isNothing()} then throws {@link Supplier#get() exSupplier.get()} else {@link #fromJust()}
      * @throws X the type of the value that is thrown
      */
-    @SuppressWarnings("null")
     public <X extends Throwable> T tryGet(final Supplier<X> exSupplier) throws X {
         if (this.isJust()) {
             return this.fromJust();
@@ -166,7 +161,7 @@ public class Maybe<T> implements Iterable<@NonNull T> {
      * @param f the mapping function
      * @return if {@link #isNothing()} then {@link #nothing()} else f.apply(fromJust())
      */
-    public <@NonNull U> Maybe<U> bind(final Function<? super T, Maybe<U>> f) {
+    public <U> Maybe<U> bind(final Function<? super T, Maybe<U>> f) {
         return this.tryBind(f::apply);
     }
 
@@ -175,7 +170,7 @@ public class Maybe<T> implements Iterable<@NonNull T> {
      * @return if {@link #isNothing()} then {@link #nothing()} else f.apply(fromJust())
      * @throws X if the mapper throws X
      */
-    public <@NonNull U, X extends Throwable> Maybe<U> tryBind(final ExFunction<? super T, Maybe<U>, X> f) throws X {
+    public <U, X extends Throwable> Maybe<U> tryBind(final ExFunction<? super T, Maybe<U>, X> f) throws X {
         if (this.isNothing()) {
             return Maybe.nothing();
         }
@@ -186,8 +181,7 @@ public class Maybe<T> implements Iterable<@NonNull T> {
      * @param f the mapping function
      * @return if {@link #isNothing()} then {@link #nothing()} else {@link #just(Object) just(f.apply(fromJust()))}
      */
-    @SuppressWarnings("null")
-    public <@NonNull U> Maybe<U> map(final Function<? super T, U> f) {
+    public <U> Maybe<U> map(final Function<? super T, U> f) {
         return this.bind(f.andThen(Maybe::maybe));
     }
 
@@ -198,8 +192,7 @@ public class Maybe<T> implements Iterable<@NonNull T> {
      * @return <tt>this.{@link #tryBind(ExFunction) tryBind}({@link #maybe(Object) maybe}∘f)</tt>
      * @throws X if <tt>f</tt> throws <tt>X</tt>
      */
-    @SuppressWarnings("null")
-    public <@NonNull U, X extends Throwable> Maybe<U> tryMap(final ExFunction<? super T, U, X> f) throws X {
+    public <U, X extends Throwable> Maybe<U> tryMap(final ExFunction<? super T, U, X> f) throws X {
         return this.tryBind(ExFunction.compose(f, Maybe::maybe));
     }
 
@@ -218,7 +211,6 @@ public class Maybe<T> implements Iterable<@NonNull T> {
     }
 
     @Override
-    @SuppressWarnings("null")
     public String toString() {
         if (this.isNothing()) {
             return "Nothing"; //$NON-NLS-1$
@@ -227,7 +219,7 @@ public class Maybe<T> implements Iterable<@NonNull T> {
     }
 
     @Override
-    public boolean equals(@Nullable final Object o) {
+    public boolean equals(final Object o) {
         if (this == o) {
             return true;
         }
@@ -274,7 +266,7 @@ public class Maybe<T> implements Iterable<@NonNull T> {
      * @param <U> the type to cast the wrapped value to
      * @return <tt>Nothing</tt> if this is <tt>Nothing</tt> or <tt>!(this instanceof U)</tt>, <tt>Just ((U) this.fromJust())</tt> otherwise
      */
-    public final <@NonNull U> Maybe<U> cast(final Class<? extends U> cls) {
+    public final <U> Maybe<U> cast(final Class<? extends U> cls) {
         return this.filter(cls::isInstance).map(cls::cast);
     }
 
@@ -341,7 +333,7 @@ public class Maybe<T> implements Iterable<@NonNull T> {
     }
 
     @Override
-    public Iterator<@NonNull T> iterator() {
+    public Iterator<T> iterator() {
         return new Iterator<>() {
             public boolean nextGotten = false;
 
@@ -362,7 +354,6 @@ public class Maybe<T> implements Iterable<@NonNull T> {
     /**
      * @return if this is <tt>Just x</tt>, a stream with <tt>x</tt> as its sole element, otherwise the empty stream
      */
-    @SuppressWarnings("null")
     public Stream<T> stream() {
         return this.isJust() ? Stream.of(this.fromJust()) : Stream.empty();
     }

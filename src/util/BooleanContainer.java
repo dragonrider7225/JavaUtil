@@ -32,7 +32,6 @@ public final class BooleanContainer extends ObjectContainer<Boolean> {
         return (BooleanContainer) this.set(value);
     }
 
-    @SuppressWarnings("null")
     @Override
     public BooleanContainer atomicUpdate(final UnaryOperator<Boolean> op) {
         if (op instanceof BooleanUnaryOperator) {
@@ -46,7 +45,6 @@ public final class BooleanContainer extends ObjectContainer<Boolean> {
      * @param op the operator
      * @return this
      */
-    @SuppressWarnings({"null", "unused"})
     public BooleanContainer atomicUpdate(final BooleanUnaryOperator op) {
         if (op == null) {
             throw new IllegalArgumentException("Expected BooleanUnaryOperator, found null"); //$NON-NLS-1$

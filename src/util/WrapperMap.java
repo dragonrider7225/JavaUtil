@@ -1,18 +1,19 @@
 package util;
 
+import edu.umd.cs.findbugs.annotations.Nullable;
+
+import java.lang.reflect.Array;
+import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Collections;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Iterator;
+import java.util.List;
 import java.util.Map;
 import java.util.Optional;
 import java.util.Set;
 import java.util.stream.Collectors;
-
-import org.eclipse.jdt.annotation.DefaultLocation;
-import org.eclipse.jdt.annotation.NonNullByDefault;
-import org.eclipse.jdt.annotation.Nullable;
 
 /**
  * This map uses another map as its default mappings. That is, if this map was created with a map
@@ -23,7 +24,6 @@ import org.eclipse.jdt.annotation.Nullable;
  * @param <K> the key type
  * @param <V> the value type
  */
-@NonNullByDefault({})
 public class WrapperMap<K, V> implements Map<K, V> {
     private final Map<K, V> back;
     private final Map<K, V> others = new HashMap<>();
@@ -135,7 +135,6 @@ public class WrapperMap<K, V> implements Map<K, V> {
                 return ret;
             }
 
-            @SuppressWarnings("null")
             @Override
             public Iterator<K> iterator() {
                 final Set<K> backKeys = new HashSet<>(backLocal.keySet());
@@ -150,7 +149,7 @@ public class WrapperMap<K, V> implements Map<K, V> {
             }
 
             @Override
-            public <T> T[] toArray(final T @Nullable [] a) {
+            public <T> T[] toArray(final @Nullable T[] a) {
                 return this.uselessKeys().toArray(a);
             }
 
@@ -242,13 +241,16 @@ public class WrapperMap<K, V> implements Map<K, V> {
                 return WrapperMap.this.entrySet().stream().map(Entry::getValue).toArray();
             }
 
-            @SuppressWarnings({"unchecked", "null"})
+            @SuppressWarnings("unchecked")
             @Override
-            public <T> T[] toArray(final T @Nullable [] a) {
+            public <T> T[] toArray(final @Nullable T[] a) {
+                if (a == null) {
+                    throw new IllegalArgumentException("Expected array, found null"); //$NON-NLS-1$
+                }
                 T[] ret = a;
                 final int size = this.size();
-                if (ret == null || ret.length < size) {
-                    ret = (T[]) new Object[size];
+                if (ret.length < size) {
+                    ret = (T[]) Array.newInstance(ret.getClass().getComponentType(), size);
                 }
                 System.arraycopy(this.toArray(), 0, ret, 0, size);
                 if (ret.length > size) {
@@ -312,7 +314,6 @@ public class WrapperMap<K, V> implements Map<K, V> {
         };
     }
 
-    @NonNullByDefault(DefaultLocation.RETURN_TYPE)
     @Override
     public Set<Entry<K, V>> entrySet() {
         final Map<K, V> backLocal = this.back;
@@ -338,34 +339,41 @@ public class WrapperMap<K, V> implements Map<K, V> {
                 return (othersLocal.containsKey(e.getKey()) ? othersLocal : backLocal).entrySet().contains(e);
             }
 
-            @SuppressWarnings("null")
             @Override
             public Iterator<Entry<K, V>> iterator() {
-                final Set<Entry<K, V>> backEntries = new HashSet<>(backLocal.entrySet());
-                final Set<Entry<K, V>> otherEntries = othersLocal.entrySet();
-                for (final Entry<K, V> otherEntry : otherEntries) {
-                    for (final Entry<K, V> backEntry : backEntries) {
-                        if (otherEntry.getKey() == backEntry.getKey()) {
-                            backEntries.remove(backEntry);
+                final List<Entry<K, V>> entries = new ArrayList<>();
+                {
+                    for (final Entry<K, V> entry : backLocal.entrySet()) {
+                        entries.add(new WrapperEntry(entry.getKey(), entry.getValue()));
+                    }
+                    outer: for (final Entry<K, V> otherEntry : othersLocal.entrySet()) {
+                        for (final Entry<K, V> entry : entries) {
+                            if (entry.getKey().equals(otherEntry.getKey())) {
+                                entry.setValue(otherEntry.getValue());
+                                continue outer;
+                            }
                         }
+                        entries.add(new WrapperEntry(otherEntry.getKey(), otherEntry.getValue()));
                     }
                 }
-                return Iterators.concat(backEntries.iterator(), otherEntries.iterator());
+                return entries.iterator();
             }
 
-            @SuppressWarnings("null")
             @Override
             public Object[] toArray() {
                 return this.stream().toArray();
             }
 
-            @SuppressWarnings({"unchecked", "null"})
+            @SuppressWarnings("unchecked")
             @Override
-            public <T> T[] toArray(final T @Nullable [] a) {
+            public <T> T[] toArray(final @Nullable T[] a) {
+                if (a == null) {
+                    throw new IllegalArgumentException("Expected array, found null"); //$NON-NLS-1$
+                }
                 T[] ret = a;
                 final int size = this.size();
-                if (ret == null || ret.length < size) {
-                    ret = (T[]) new Object[size];
+                if (ret.length < size) {
+                    ret = (T[]) Array.newInstance(ret.getClass().getComponentType(), size);
                 }
                 System.arraycopy(this.toArray(), 0, ret, 0, size);
                 if (ret.length > size) {
@@ -421,5 +429,35 @@ public class WrapperMap<K, V> implements Map<K, V> {
                 othersLocal.entrySet().clear();
             }
         };
+    }
+
+    private final class WrapperEntry implements Entry<K, V> {
+        private final K key;
+        private V value;
+
+        public WrapperEntry(final K key, final V value) {
+            this.key = key;
+            this.value = value;
+        }
+
+        @Override
+        public K getKey() {
+            return this.key;
+        }
+
+        @Override
+        public V getValue() {
+            return this.value;
+        }
+
+        @Override
+        public V setValue(final V value) {
+            if (value != this.value) {
+                final V ret = WrapperMap.this.put(this.key, value);
+                this.value = value;
+                return ret;
+            }
+            return value;
+        }
     }
 }

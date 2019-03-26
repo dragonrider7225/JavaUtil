@@ -11,8 +11,6 @@ import java.util.function.Predicate;
 import java.util.stream.Stream;
 import java.util.stream.StreamSupport;
 
-import org.eclipse.jdt.annotation.NonNull;
-
 import util.number.UInt32;
 
 /**
@@ -239,7 +237,6 @@ public interface AnnotatedNonNullList<C extends AnnotatedNonNullList<C, T>, T> /
      * see {@link #toArray(IntFunction)}.
      * @return an object array that is identical to the current state of this list
      */
-    @SuppressWarnings("null")
     default Object[] toArray() {
         return this.stream().toArray();
     }
@@ -249,8 +246,7 @@ public interface AnnotatedNonNullList<C extends AnnotatedNonNullList<C, T>, T> /
      * @param arrayGenerator the function to generate the returned array. Must return a new array on each invocation.
      * @return a new array representing this list
      */
-    @SuppressWarnings("null")
-    default <A> @NonNull A[] toArray(final IntFunction<A[]> arrayGenerator) {
+    default <A> A[] toArray(final IntFunction<A[]> arrayGenerator) {
         return this.stream().toArray(arrayGenerator);
     }
 
@@ -262,7 +258,6 @@ public interface AnnotatedNonNullList<C extends AnnotatedNonNullList<C, T>, T> /
     /**
      * @return a spliterator over this list
      */
-    @SuppressWarnings("null")
     default Spliterator<T> spliterator() {
         return Spliterators.spliterator(this.iterator(), this.size().longValue(), Spliterator.ORDERED);
     }
@@ -284,7 +279,6 @@ public interface AnnotatedNonNullList<C extends AnnotatedNonNullList<C, T>, T> /
     /**
      * @return a stream over the elements of this list
      */
-    @SuppressWarnings("null")
     default Stream<T> stream() {
         return StreamSupport.stream(this.spliterator(), false);
     }

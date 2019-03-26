@@ -1,19 +1,16 @@
 package util;
 
+import edu.umd.cs.findbugs.annotations.Nullable;
+
 import java.lang.reflect.Array;
 import java.util.Collection;
 import java.util.Iterator;
 import java.util.List;
 import java.util.ListIterator;
 
-import org.eclipse.jdt.annotation.NonNull;
-import org.eclipse.jdt.annotation.NonNullByDefault;
-import org.eclipse.jdt.annotation.Nullable;
-
 import util.number.UInt32;
 
-@NonNullByDefault({})
-final class WrappedAnnotatedNonNullList<@NonNull T> implements List<T> {
+final class WrappedAnnotatedNonNullList<T> implements List<T> {
     private final AnnotatedNonNullList<?, T> base;
 
     WrappedAnnotatedNonNullList(final AnnotatedNonNullList<?, T> base) {
@@ -48,7 +45,6 @@ final class WrappedAnnotatedNonNullList<@NonNull T> implements List<T> {
         return this.base.toArray();
     }
 
-    @SuppressWarnings("null")
     @Override
     public <A> A[] toArray(final A[] a) {
         if (a == null) {
@@ -131,16 +127,14 @@ final class WrappedAnnotatedNonNullList<@NonNull T> implements List<T> {
         this.base.clear();
     }
 
-    @SuppressWarnings("null")
     @Override
-    public /* @Nullable */ T get(final int index) {
-        return (@NonNull T) this.base.get(UInt32.asUnsigned(index)).fromMaybeNullable(null);
+    public @Nullable T get(final int index) {
+        return this.base.get(UInt32.asUnsigned(index)).fromMaybeNullable(null);
     }
 
-    @SuppressWarnings("null")
     @Override
-    public /* @Nullable */ T set(final int index, final T element) {
-        return (@NonNull T) this.base.set(UInt32.asUnsigned(index), element).snd().fromMaybeNullable(null);
+    public @Nullable T set(final int index, final T element) {
+        return this.base.set(UInt32.asUnsigned(index), element).snd().fromMaybeNullable(null);
     }
 
     @Override
@@ -148,10 +142,9 @@ final class WrappedAnnotatedNonNullList<@NonNull T> implements List<T> {
         this.base.insert(UInt32.asUnsigned(index), element);
     }
 
-    @SuppressWarnings("null")
     @Override
-    public /* @Nullable */ T remove(final int index) {
-        return (@NonNull T) this.base.remove(UInt32.asUnsigned(index)).snd().fromMaybeNullable(null);
+    public @Nullable T remove(final int index) {
+        return this.base.remove(UInt32.asUnsigned(index)).snd().fromMaybeNullable(null);
     }
 
     @SuppressWarnings("unchecked")

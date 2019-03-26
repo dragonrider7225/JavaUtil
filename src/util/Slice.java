@@ -1,13 +1,13 @@
 package util;
 
+import edu.umd.cs.findbugs.annotations.NonNull;
+
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Iterator;
 import java.util.ListIterator;
 import java.util.NoSuchElementException;
 import java.util.function.Predicate;
-
-import org.eclipse.jdt.annotation.NonNull;
 
 import util.number.UInt32;
 
@@ -77,7 +77,7 @@ public class Slice<T> implements AnnotatedNonNullList<Slice<T>, T> {
     }
 
     @Override
-    public Maybe<@NonNull T> get(final UInt32 index) {
+    public Maybe<T> get(final UInt32 index) {
         final Pair<Boolean, UInt32> baseIdx = this.fromIdx.plus(index);
         if (baseIdx.fst() || baseIdx.snd().gte(this.toIdx)) {
             return Maybe.nothing();
@@ -96,7 +96,7 @@ public class Slice<T> implements AnnotatedNonNullList<Slice<T>, T> {
     }
 
     @Override
-    public Slice<T> addAll(final Collection<? extends @NonNull T> c) {
+    public Slice<T> addAll(final Collection<? extends T> c) {
         if (c.size() == 0) {
             return this;
         }
@@ -104,7 +104,7 @@ public class Slice<T> implements AnnotatedNonNullList<Slice<T>, T> {
     }
 
     @Override
-    public Slice<T> addAll(final UInt32 index, final Collection<? extends @NonNull T> c) {
+    public Slice<T> addAll(final UInt32 index, final Collection<? extends T> c) {
         if (c.size() == 0) {
             return this;
         }
@@ -112,7 +112,7 @@ public class Slice<T> implements AnnotatedNonNullList<Slice<T>, T> {
     }
 
     @Override
-    public Pair<Slice<T>, Maybe<@NonNull T>> set(final UInt32 index, @NonNull final T value) {
+    public Pair<Slice<T>, Maybe<T>> set(final UInt32 index, @NonNull final T value) {
         final var baseIdx = index.plus(this.fromIdx);
         if (baseIdx.fst() || baseIdx.snd().gte(this.toIdx)) {
             return new Pair<>(this, Maybe.nothing());
@@ -121,22 +121,22 @@ public class Slice<T> implements AnnotatedNonNullList<Slice<T>, T> {
     }
 
     @Override
-    public Pair<Slice<T>, Maybe<@NonNull T>> remove(final UInt32 index) {
+    public Pair<Slice<T>, Maybe<T>> remove(final UInt32 index) {
         throw new UnsupportedOperationException("Can't mutate size of slice"); //$NON-NLS-1$
     }
 
     @Override
-    public Pair<Slice<T>, Maybe<@NonNull T>> remove(final Object o) {
+    public Pair<Slice<T>, Maybe<T>> remove(final Object o) {
         throw new UnsupportedOperationException("Can't mutate size of slice"); //$NON-NLS-1$
     }
 
     @Override
-    public Pair<Slice<T>, Maybe<@NonNull T>> pureRemove(final UInt32 index) {
+    public Pair<Slice<T>, Maybe<T>> pureRemove(final UInt32 index) {
         throw new UnsupportedOperationException("Can't mutate size of slice"); //$NON-NLS-1$
     }
 
     @Override
-    public Pair<Slice<T>, Maybe<@NonNull T>> pureRemove(final Object o) {
+    public Pair<Slice<T>, Maybe<T>> pureRemove(final Object o) {
         throw new UnsupportedOperationException("Can't mutate size of slice"); //$NON-NLS-1$
     }
 
@@ -157,7 +157,7 @@ public class Slice<T> implements AnnotatedNonNullList<Slice<T>, T> {
     }
 
     @Override
-    public Slice<T> removeIf(final Predicate<? super @NonNull T> p) {
+    public Slice<T> removeIf(final Predicate<? super T> p) {
         throw new UnsupportedOperationException("Can't mutate size of slice"); //$NON-NLS-1$
     }
 
@@ -167,7 +167,7 @@ public class Slice<T> implements AnnotatedNonNullList<Slice<T>, T> {
     }
 
     @Override
-    public Slice<T> pureRemoveIf(final Predicate<? super @NonNull T> p) {
+    public Slice<T> pureRemoveIf(final Predicate<? super T> p) {
         throw new UnsupportedOperationException("Can't get slice without base list"); //$NON-NLS-1$
     }
 
@@ -180,17 +180,17 @@ public class Slice<T> implements AnnotatedNonNullList<Slice<T>, T> {
     }
 
     @Override
-    public Slice<T> retainIf(final Predicate<? super @NonNull T> p) {
+    public Slice<T> retainIf(final Predicate<? super T> p) {
         throw new UnsupportedOperationException("Can't mutate size of slice"); //$NON-NLS-1$
     }
 
     @Override
-    public Slice<T> pureRetainIf(final Predicate<? super @NonNull T> p) {
+    public Slice<T> pureRetainIf(final Predicate<? super T> p) {
         throw new UnsupportedOperationException("Can't get slice without base list"); //$NON-NLS-1$
     }
 
     @Override
-    public Iterator<@NonNull T> iterator() {
+    public Iterator<T> iterator() {
         final Iterator<T> iter = this.base.iterator();
         return new Iterator<>() {
             private final UInt32 i = UInt32.ZERO;
@@ -205,7 +205,6 @@ public class Slice<T> implements AnnotatedNonNullList<Slice<T>, T> {
                 return this.i.lessThan(Slice.this.toIdx) && iter.hasNext();
             }
 
-            @SuppressWarnings("null")
             public T next() {
                 if (this.hasNext()) {
                     return iter.next();
@@ -216,12 +215,12 @@ public class Slice<T> implements AnnotatedNonNullList<Slice<T>, T> {
     }
 
     @Override
-    public ListIterator<@NonNull T> listIterator() {
+    public ListIterator<T> listIterator() {
         return this.listIterator(UInt32.ZERO);
     }
 
     @Override
-    public ListIterator<@NonNull T> listIterator(final UInt32 startIndex) {
+    public ListIterator<T> listIterator(final UInt32 startIndex) {
         final UInt32 endIdx = this.size();
         final UInt32 startIdx = startIndex.lessThan(endIdx) ? startIndex : endIdx;
         // fromIdx + startIdx can't overflow because startIdx <= this.size() and fromIdx + this.size() <= base.size()

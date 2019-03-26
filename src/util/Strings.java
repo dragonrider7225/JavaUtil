@@ -13,7 +13,6 @@ public final class Strings {
      * @param cs the CharSequence to take at most <tt>len</tt> chars from.
      * @return the longest prefix of the given CharSequence with length less than or equal to <tt>len</tt>
      */
-    @SuppressWarnings("null")
     public static CharSequence take(final int len, final CharSequence cs) {
         if (cs.length() <= len) {
             return cs;
