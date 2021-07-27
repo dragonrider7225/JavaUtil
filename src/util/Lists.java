@@ -4,6 +4,7 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Random;
 import java.util.function.BiFunction;
+import java.util.function.Function;
 
 import util.function.TriFunction;
 
@@ -34,7 +35,11 @@ public final class Lists {
      * @param snd the list of second arguments to joiner
      * @return the list of c<sub>i</sub>=joiner(fst.get(i), snd.get(i)) such that 0 &le; i &lt; min(fst.size(), snd.size())
      */
-    public static <T, U, V> List<V> zipWith(final BiFunction<T, U, V> joiner, final List<T> fst, final List<U> snd) {
+    public static <T, U, V> List<V> zipWith(
+            final BiFunction<? super T, ? super U, ? extends V> joiner,
+            final List<T> fst,
+            final List<U> snd) {
+
         return Lists.zipIndexWith((i, f, s) -> joiner.apply(f, s), fst, snd);
     }
 
@@ -62,7 +67,11 @@ public final class Lists {
      * corresponding values in fst and snd. The length of the returned list is
      * {@code Math.min(fst.size(), snd.size())}.
      */
-    public static <T, U, V> List<V> zipIndexWith(final TriFunction<Integer, T, U, V> joiner, final List<T> fst, final List<U> snd) {
+    public static <T, U, V> List<V> zipIndexWith(
+            final TriFunction<Integer, ? super T, ? super U, ? extends V> joiner,
+            final List<T> fst,
+            final List<U> snd) {
+
         final int size = Math.min(fst.size(), snd.size());
         final List<V> ret = new ArrayList<>();
         for (int i = 0; i < size; i++) {
@@ -73,16 +82,26 @@ public final class Lists {
 
     /**
      * Create and return a list such that each element is a function of its index and the value at its index in the specified list.
-     * @param xs the list to map
      * @param mapper the mapping function
+     * @param xs the list to map
      * @return the mapped list
      */
-    public static <T, U> List<U> mapIndex(final List<T> xs, final BiFunction<Integer, T, U> mapper) {
+    public static <T, U> List<U> mapIndex(final BiFunction<Integer, ? super T, ? extends U> mapper, final List<T> xs) {
         final List<U> ret = new ArrayList<>(xs.size());
         for (int i = 0; i < xs.size(); i++) {
             ret.set(i, mapper.apply(i, xs.get(i)));
         }
         return ret;
+    }
+
+    /**
+     * Create and return a list such that each element is a function of the value at its index in the specified list.
+     * @param mapper the mapping function
+     * @param xs the list to map
+     * @return the mapped list
+     */
+    public static <T, U> List<U> map(final Function<? super T, ? extends U> mapper, final List<T> xs) {
+        return Lists.mapIndex((none, x) -> mapper.apply(x), xs);
     }
 
     /**
